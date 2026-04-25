@@ -331,10 +331,7 @@ def view_pseudo(code: str, *, optimize: bool = False) -> dict[str, Any]:
     co_consts = _merge_co_consts(
         _co_consts_from_metadata(metadata), _compiled_co_consts(code)
     )
-    # On some newer WASM builds (e.g. CPython 3.15 snapshots), optimize_cfg can
-    # trap at runtime with low-level wasm errors. Prefer a stable pseudo view
-    # there instead of crashing the whole worker process.
-    if optimize and sys.version_info < (3, 15):
+    if optimize:
         insts = optimize_cfg(insts, co_consts, 0)
     items = _instruction_items(insts)
     adjusted_consts = _apply_annotations_const_workaround(items, co_consts)
