@@ -21,8 +21,11 @@ class WebDriverTests(unittest.TestCase):
 
     def test_view_ast_returns_module_dump(self) -> None:
         rendered = driver.view_ast("x = 1\n", optimize=False)
-        self.assertIn("Module(", rendered)
-        self.assertIn("Assign(", rendered)
+        self.assertTrue(rendered["html"])
+        self.assertIn(">Module</span>(", rendered["text"])
+        self.assertIn(">Assign</span>(", rendered["text"])
+        # Every row maps back to source line 1 via lineno propagation.
+        self.assertTrue(all(ln == 1 for ln in rendered["lines"] if ln is not None))
 
     def test_view_pseudo_smoke(self) -> None:
         rendered = driver.view_pseudo("def f(x):\n    return x\n\nprint(f(42))\n")
