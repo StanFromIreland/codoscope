@@ -211,6 +211,8 @@ def _co_consts_from_metadata(metadata):
     if not metadata:
         return None
     consts = metadata.get("consts")
+    if isinstance(consts, list):
+        return list(consts) if consts else None
     if not isinstance(consts, dict) or not consts:
         return None
     # compiler metadata stores const->index and indices may be sparse.
