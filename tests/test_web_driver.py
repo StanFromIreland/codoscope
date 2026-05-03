@@ -16,8 +16,8 @@ from web import driver  # noqa: E402
 class WebDriverTests(unittest.TestCase):
     def test_view_tokens_includes_token_names(self) -> None:
         rendered = driver.view_tokens("x = 1\n")
-        self.assertIn("NAME", rendered)
-        self.assertIn("NUMBER", rendered)
+        self.assertIn("NAME", rendered['text'])
+        self.assertIn("NUMBER", rendered['text'])
 
     def test_view_ast_returns_module_dump(self) -> None:
         rendered = driver.view_ast("x = 1\n", optimize=False)
@@ -29,11 +29,14 @@ class WebDriverTests(unittest.TestCase):
 
     def test_view_pseudo_smoke(self) -> None:
         rendered = driver.view_pseudo("def f(x):\n    return x\n\nprint(f(42))\n")
-        self.assertIn("LOAD_CONST", rendered)
+        self.assertIn("LOAD_CONST", rendered['text'])
 
     def test_view_compiled_smoke(self) -> None:
         rendered = driver.view_compiled("x = 1\n")
-        self.assertIn("LOAD_CONST", rendered)
+        if sys.version_info < (3, 15):
+            self.assertIn("LOAD_CONST", rendered['text'])
+        else:
+            self.assertIn("LOAD_SMALL_INT", rendered['text'])
 
     def test_instruction_items_supports_list_and_get_instructions(self) -> None:
         inst = dis.Instruction(
